@@ -13,22 +13,22 @@ if (isset($group_id) && !empty($group_id) && isset($auction_month) && !empty($au
         SELECT gs.cus_id
         FROM auction_details ad
         LEFT JOIN group_share gs ON ad.cus_name = gs.cus_mapping_id
-        WHERE group_id = '$group_id' AND gs.settle_status = 'Yes'
+        WHERE group_id = '$group_id' 
         AND auction_month < '$auction_month'
     ";
+    
     $taken_customers = $pdo->query($taken_auction_qry)->fetchAll(PDO::FETCH_COLUMN);
 
     // Get the list of customer names already in other_transaction for this group
     $transaction_qry = "
-    SELECT gs.cus_mapping_id
-    FROM other_transaction os
-     LEFT JOIN group_share gs ON os.group_mem = gs.cus_id
-    WHERE gs.grp_creation_id = '$group_id' ;
+    SELECT group_mem 
+    FROM other_transaction 
+    WHERE group_id = '$group_id' AND type =2;
 ";
     $transaction_customers = $pdo->query($transaction_qry)->fetchAll(PDO::FETCH_COLUMN);
 
     // Get eligible customers for the current auction month
-    $qry = "
+     $qry = "
     (
         SELECT 
             gcm.id,
@@ -69,7 +69,7 @@ if (isset($group_id) && !empty($group_id) && isset($auction_month) && !empty($au
             '' AS place,
             (SELECT COUNT(*) 
              FROM group_share gs_sub
-             WHERE gs_sub.cus_id = gs.cus_id AND gs_sub.grp_creation_id = '$group_id') AS chit_count
+             WHERE gs_sub.id = gs.id AND gs_sub.grp_creation_id = '$group_id') AS chit_count
         FROM 
             group_share gs
         JOIN 
@@ -85,15 +85,12 @@ if (isset($group_id) && !empty($group_id) && isset($auction_month) && !empty($au
             COUNT(*) > 1
     );
 ";
-
-
     $customers = $pdo->query($qry)->fetchAll(PDO::FETCH_ASSOC);
 
     // Filter customers based on their chit count, auction participation, and transactions in the other_transaction table
     foreach ($customers as $customer) {
         $customer_ids = explode(',', $customer['cust_id']); // Split combined customer IDs
         $chit_count = $customer['chit_count'];
-        
 
         // Loop through each customer ID and process
         foreach ($customer_ids as $customer_id) {

@@ -103,7 +103,7 @@ WHERE LOWER(REPLACE(TRIM(b.branch_name), ' ', ''))  = LOWER(REPLACE(TRIM('$branc
         $user_id = $_SESSION['user_id'];
         // Check if the place already exists (case-insensitive and ignoring spaces)
         $check_querys = "SELECT grp_name FROM group_creation 
-  WHERE LOWER(REPLACE(TRIM(grp_name), ' ', '')) = LOWER(REPLACE(TRIM('" . $data['grp_name'] . "'), ' ', ''))";
+  WHERE LOWER(REPLACE(TRIM(grp_name), ' ', '')) = LOWER(REPLACE(TRIM('" . $data['grp_name'] . "'), ' ', '')) and status <=3";
         // Execute the query
         $result1 = $pdo->query($check_querys);
 

@@ -406,26 +406,8 @@ $(document).ready(function () {
         // Get the settle type
         let settleType = $('#settle_type').val();
 
-        // Validation for the file upload based on settle_type
-        let isUploadValid = true;
-        if (settleType == '1') { // Assuming '1' means you want to validate den_upload
-            if (!fileInput && !$('#den_upload_edit').val()) {
-                isUploadValid = validateField('', 'den_upload_edit');
-                if (!isUploadValid) {
-                    $('#den_upload').css('border', '1px solid red'); // Highlight invalid field
-                }
-            } else {
-                $('#den_upload').css('border', '1px solid #cecece');
-                $('#den_upload_edit').css('border', '1px solid #cecece');
-            }
-        } else {
-            // If settle_type is not 1, clear any previous highlights
-            $('#den_upload').css('border', '1px solid #cecece');
-            $('#den_upload_edit').css('border', '1px solid #cecece');
-        }
-
         // Validate the form data
-        let isValid = isFormDataValid(settleInfo) && isUploadValid;
+        let isValid = isFormDataValid(settleInfo);
 
         // Check if the form is valid before submission
         if (isValid) {

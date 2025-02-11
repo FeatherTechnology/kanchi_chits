@@ -7,4 +7,3 @@ $db_pass = "";
 $dbname = "kanchi_chit";
 $pdo = new PDO("mysql:host=$host; dbname=$dbname", $db_user, $db_pass);
 $pdo->exec($timeZoneQry);
-
