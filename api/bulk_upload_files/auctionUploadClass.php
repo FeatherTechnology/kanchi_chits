@@ -266,7 +266,7 @@ class auctionUploadClass
                 $pdo->query($insert_query1);
 
                 // Check if the insert was successful
-                if ($pdo->lastInsertId()) {
+         
                     // Update the status in the group_creation table to indicate the group is in auction (status 3)
                     $pdo->query("UPDATE group_creation SET status = '3', update_login_id = '$user_id', updated_on = NOW() WHERE grp_id = '" . strip_tags($data['grp_id']) . "'");
 
@@ -288,7 +288,7 @@ class auctionUploadClass
                             $pdo->query("UPDATE group_creation SET status = '4', update_login_id = '$user_id', updated_on = NOW() WHERE grp_id = '" . strip_tags($data['grp_id']) . "'");
                         }
                     }
-                }
+                
             } else {
                 // Handle case where group data is not found
                 echo "Error: Group not found or invalid group ID.";
@@ -372,7 +372,7 @@ class auctionUploadClass
         }
     
         // Update auction_details only if auction_value is valid
-        if ($auction_value > 0) {
+        if (!empty($data['settle_date'])) {
             try {
                 // Prepare and execute the auction_details update query
                 $auction_update = "
