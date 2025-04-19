@@ -105,7 +105,8 @@ $collections_query = '';
 // Execute queries
 $current_statement = $pdo->query($current_auction_query);
 $previous_statement = $pdo->query($previous_auction_query);
-
+$previous_collection_amount =0;
+$previous_chit_amount =0;
 $response = [];
 $pending = 0; // Initialize pending amount
 $auction_month = 0;
@@ -117,9 +118,10 @@ if ($current_statement->rowCount() > 0) {
 
     // Loop through the previous auction data to calculate pending amount
     while ($previous_row = $previous_statement->fetch(PDO::FETCH_ASSOC)) {
-        $previous_collection_amount = (int)$previous_row['collection_amount'];
-        $previous_chit_amount = (int)$previous_row['chit_share'];
-        $pending += max(0, $previous_chit_amount - $previous_collection_amount);
+        $previous_collection_amount += (int)$previous_row['collection_amount'];
+        $previous_chit_amount += (int)$previous_row['chit_share'];
+     
+        $pending = max(0, $previous_chit_amount - $previous_collection_amount);
         // $previous_auction_month = max(0,(int)$previous_row['auction_month']);
         $previous_auction_month = max($auction_month, (int)$previous_row['auction_month']);
         $prev_auction_date = date('d-m-Y', strtotime($previous_row['date']));

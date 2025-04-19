@@ -14,10 +14,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $format_date = new DateTime($formatted_date);
         $formatted_date = $format_date->format('Y-m-d');
-
+        $subQuery1 = $pdo->query("SELECT status  FROM group_creation WHERE grp_id = '$group_id'");
+        if ($subQuery1->rowCount() > 0) {
+            $result1 = $subQuery1->fetch(PDO::FETCH_ASSOC);
+            $group_status = $result1['status'];
+        } else {
+            $group_status = 0;
+        }
         // Subquery to get the count of auction details
         $subQuery = "SELECT COUNT(*) AS total FROM auction_details WHERE group_id = '$group_id'";
-
         // Main query to get the earliest date and total count from auction_details
         $stmt = $pdo->query("SELECT 
                 (SELECT date FROM auction_details WHERE group_id = '$group_id' ORDER BY date ASC LIMIT 1) AS first_date,
@@ -32,25 +37,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($result) {
                 $first_date = new DateTime($result['first_date']);
                 $total = $result['total'];
+                if ($group_status < 3) {
+                    // Check if the formatted_date matches the first_date and total matches $total_months
+                    if ($formatted_date == $first_date->format('Y-m-d') && $total == $total_months) {
 
-                // Check if the formatted_date matches the first_date and total matches $total_months
-                if ($formatted_date == $first_date->format('Y-m-d') && $total == $total_months) {
-                    
-                    // Fetch data from auction_details
-                    $stmt = $pdo->query("SELECT auction_month, date, low_value, high_value FROM auction_details WHERE group_id = '$group_id'");
-                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        // Fetch data from auction_details
+                        $stmt = $pdo->query("SELECT auction_month, date, low_value, high_value FROM auction_details WHERE group_id = '$group_id'");
+                        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    // Format dates to "Aug 2024"
-                    foreach ($data as &$row) {
-                        $date = new DateTime($row['date']);
-                        $row['date'] = $date->format('M Y');
+                        // Format dates to "Aug 2024"
+                        foreach ($data as &$row) {
+                            $date = new DateTime($row['date']);
+                            $row['date'] = $date->format('M Y');
+                        }
+
+                        echo json_encode([
+                            'result' => 1, // Data found
+                            'data' => $data
+                        ]);
+                        exit();
                     }
+                } else {
+                    if ($total == $total_months) {
 
-                    echo json_encode([
-                        'result' => 1, // Data found
-                        'data' => $data
-                    ]);
-                    exit();
+                        // Fetch data from auction_details
+                        $stmt = $pdo->query("SELECT auction_month, date, low_value, high_value FROM auction_details WHERE group_id = '$group_id'");
+                        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Format dates to "Aug 2024"
+                        foreach ($data as &$row) {
+                            $date = new DateTime($row['date']);
+                            $row['date'] = $date->format('M Y');
+                        }
+
+                        echo json_encode([
+                            'result' => 1, // Data found
+                            'data' => $data
+                        ]);
+                        exit();
+                    }
                 }
             }
         }
@@ -73,4 +98,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
     }
 }
-?>

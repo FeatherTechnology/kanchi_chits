@@ -4,7 +4,7 @@ require '../../ajaxconfig.php';
 $user_id = $_SESSION['user_id'];
 
 // Define status mapping array
-$status_arr = [1 => 'Process', 2 => 'Created', 3 => 'Current', 4 => 'Closed'];
+$status_arr = [1 => 'Process', 2 => 'Created', 3 => 'Current', 4 => 'Closed',5 => 'Closed'];
 
 // Define column names for sorting
 $column = array(
